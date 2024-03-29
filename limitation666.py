@@ -41,27 +41,15 @@ def count_tokens_in_dialogue(messages: sqlite3.Row):
         'Content-Type': 'application/json'
     }
     data = {
-       "modelUri": f"gpt://{folder_id}/yandexgpt-lite/latest",
-       "maxTokens": MAX_MODEL_TOKENS,
-       "messages": []
+        "modelUri": f"gpt://{folder_id}/yandexgpt-lite/latest",  # указываем folder_id
+        "maxTokens": MAX_MODEL_TOKENS,
+        "text": messages  # messages - тот текст, в котором мы хотим посчитать токены
     }
 
-    for row in messages:
-        data["messages"].append(
-            {
-                "role": row["role"],
-                "text": row["content"]
-            }
-        )
-
-    result=requests.post(
-        "https://llm.api.cloud.yandex.net/foundationModels/v1/tokenizeCompletion",
-        headers=headers,
-        json=data).json()
-
-    try:
-        result = result['tokens']
-        logging.error("Токены для промпта успешно подсчитаны.")
-        return len(result)
-    except KeyError:
-        logging.error("Не удалось посчитать токены для промпта, так как токен недействителен.")
+    return len(
+        requests.post(
+            "https://llm.api.cloud.yandex.net/foundationModels/v1/tokenizeCompletion",
+            json=data,
+            headers=headers
+        ).json()["tokens"]
+    )
