@@ -35,7 +35,7 @@ def is_limit_tokens(user_id, tokens):
     return tokens > MAX_TOKENS
 
 
-def count_tokens_in_dialogue(messages: sqlite3.Row):
+def count_tokens_in_dialogue(messages):
     headers = {
         'Authorization': f'Bearer {iam_token}',
         'Content-Type': 'application/json'
