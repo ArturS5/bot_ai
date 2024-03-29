@@ -1,4 +1,5 @@
 import requests
+import logging
 from config666 import *
 from database666 import *
 
@@ -53,10 +54,14 @@ def count_tokens_in_dialogue(messages: sqlite3.Row):
             }
         )
 
-    return len(
-        requests.post(
-            "https://llm.api.cloud.yandex.net/foundationModels/v1/tokenizeCompletion",
-            json=data,
-            headers=headers
-        ).json()["tokens"]
-    )
+    result=requests.post(
+        "https://llm.api.cloud.yandex.net/foundationModels/v1/tokenizeCompletion",
+        headers=headers,
+        json=data).json()
+
+    try:
+        result = result['tokens']
+        logging.error("Токены для промпта успешно подсчитаны.")
+        return len(result)
+    except KeyError:
+        logging.error("Не удалось посчитать токены для промпта, так как токен недействителен.")
